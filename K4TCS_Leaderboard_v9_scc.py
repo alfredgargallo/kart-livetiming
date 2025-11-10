@@ -87,6 +87,15 @@ tr {
 </style>
 """, unsafe_allow_html=True)
 
+# === Bloque extra: ocultar menú/footers/enlaces de Streamlit ===
+st.markdown("""
+<style>
+#MainMenu {visibility: hidden;}   /* Oculta el menú (tres puntos) */
+footer {visibility: hidden;}      /* Oculta el pie "Made with Streamlit" y enlaces */
+header {visibility: hidden;}      /* Oculta la cabecera superior */
+</style>
+""", unsafe_allow_html=True)
+
 # ============================
 # util
 # ============================
