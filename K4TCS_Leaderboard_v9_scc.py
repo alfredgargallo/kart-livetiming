@@ -144,11 +144,6 @@ try:
         now = datetime.now()
 
         try:
-
-
-
-
-
             df = load_data()
         except Exception:
             placeholder.info("⏳ Esperando datos (archivo no legible todavía)...")
