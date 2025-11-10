@@ -87,6 +87,36 @@ tr {
 </style>
 """, unsafe_allow_html=True)
 
+st.markdown("""
+<style>
+/* Menú superior y cabecera */
+#MainMenu { display: none !important; }
+header { display: none !important; }
+
+/* Footer “clásico” */
+footer { display: none !important; }
+
+/* Footer nuevo de Streamlit (SCC) */
+div[data-testid="stFooter"] { display: none !important; }
+
+/* Barra/toolbar flotante (a veces aparece aunque se oculte el menú) */
+div[data-testid="stToolbar"] { display: none !important; }
+
+/* Badge/botón de “Hosted by Streamlit”, “View source”, etc. (nombres/clases habituales) */
+div.viewerBadge_container__1QSob { display: none !important; }
+div.viewerBadge_link__1S137 { display: none !important; }
+div.stDeployButton { display: none !important; }
+
+/* Enlaces por URL (fallback por si cambian clases/testid) */
+a[href*="streamlit.app/profile"] { display: none !important; }
+a[href*="streamlit.io"] { display: none !important; }
+
+/* Por si queda espacio fantasma al final de la página */
+section.main > div.block-container + div { display: none !important; }
+</style>
+""", unsafe_allow_html=True)
+
+
 # === Bloque extra: ocultar menú/footers/enlaces de Streamlit ===
 st.markdown("""
 <style>
