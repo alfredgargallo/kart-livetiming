@@ -9,7 +9,7 @@ from datetime import datetime
 # ============================
 # CONFIGURABLES
 # ============================
-CSV_URL = os.environ.get("CSV_URL", "https://drive.google.com/uc?export=download&id=1UBDfNvA4F6ijdr25YUBIj2guS7H1oTX6")
+CSV_URL = os.environ.get("CSV_URL", "https://drive.google.com/uc?export=download&id=1AjZI7oFmivBzs39fX7f_bWwyULA_P75T")
 @st.cache_data(ttl=3)
 def load_data():
     # cache-buster para evitar caché intermedia en Drive
