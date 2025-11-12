@@ -50,6 +50,7 @@ tr th {
   text-align: center !important;
   vertical-align: middle !important;
   padding: 2px!important;
+  border: none !important;
 }
 
 /* (opcional) tu color de fondo y borde */
