@@ -8,7 +8,7 @@ import streamlit as st
 # ============================
 # CONFIGURABLES (SCC + Drive)
 # ============================
-CSV_URL = os.environ.get("CSV_URL", "https://drive.google.com/uc?export=download&id=TU_FILE_ID")
+CSV_URL = os.environ.get("CSV_URL", "https://drive.google.com/uc?export=download&id=1AjZI7oFmivBzs39fX7f_bWwyULA_P75T")
 REFRESH_INTERVAL = 2  # segundos
 # ============================
 
