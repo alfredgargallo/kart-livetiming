@@ -31,7 +31,7 @@ st.markdown("""
 @keyframes flashGlow { 0% { box-shadow: 0 0 18px 8px rgba(255,235,59,0.95); } 100% { box-shadow: none; } }
 .slide-in { animation: slideInAnim 0.8s ease-out; }
 @keyframes slideInAnim { 0% { transform: translateX(-20px); opacity: 0.5; } 100% { transform: translateX(0); opacity: 1; } }
-th { background: #d9d9d9; border-bottom: 2px solid #aaa;}
+th { background: #d9d9d9; border-bottom: 2px solid #aaa; }
 td, th { padding: 6px; text-align: center; }
 table { width: 100%; border-collapse: collapse; margin-top: 10px; font-family: Arial, Helvetica, sans-serif; }
 tr { transition: all 0.8s ease-in-out; }
