@@ -18,6 +18,7 @@ st.markdown("""
     <div style="background-color: black; padding: 2px 5px; align-items: center;">
         <h3 style="color: white; text-align: center; margin: 0;">Livetiming</h3>
     </div>
+    <div style="height: 10px;"></div>
 """, unsafe_allow_html=True)
 
 st.markdown("""
