@@ -61,7 +61,6 @@ table th {
 table td { text-align: center; }
 table td:first-child {
   background-color: #fff8b3;   /* amarillo suave */
-  border: 2px solid #ffd60a;   /* borde amarillo más fuerte */
   font-weight: bold;
   color: #333;                 /* texto oscuro para contraste */
 }
