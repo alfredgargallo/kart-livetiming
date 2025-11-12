@@ -64,6 +64,8 @@ table td:first-child {
   font-weight: bold;
   color: #333;                 /* texto oscuro para contraste */
 }
+table tr:nth-child(odd)  { background-color: #ffffff; }  /* filas impares: blanco */
+table tr:nth-child(even) { background-color: #f7f7f7; }  /* filas pares: gris claro */
 </style>
 """, unsafe_allow_html=True)
 
