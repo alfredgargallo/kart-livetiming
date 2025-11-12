@@ -13,7 +13,7 @@ REFRESH_INTERVAL = 2  # segundos
 # ============================
 
 st.set_page_config(page_title="K4TCS Leaderboard", layout="centered")
-st.image("kartingsallent.png")
+st.image("media/kartingsallent.png")
 st.markdown("""
     <div style="background-color: black; padding: 10px 30px; align-items: center;">
         <h1 style="color: white; text-align: center; margin: 0;">Livetiming</h1>
@@ -64,6 +64,7 @@ def render_table_with_fade(display_df, row_color):
 def load_classification(url: str):
     return pd.read_csv(f"{url}&v={int(time.time())}")
 
+# Estado persistente para transiciones
 if "prev_best" not in st.session_state:
     st.session_state.prev_best = {}
 if "global_best" not in st.session_state:
@@ -90,23 +91,28 @@ try:
             time.sleep(REFRESH_INTERVAL)
             continue
 
-        for col in ["position","kart_number","best_time_ms","last_time_ms","laps","estado"]:
+        # Asegurar columnas esperadas del CSV de clasificación
+        # (position, kart_number, best_time_ms, best_time_str, last_time_ms, last_time_str, laps, estado, updated_at_utc)
+        for col in ["position","kart_number","best_time_ms","last_time_ms","laps"]:
             if col not in df.columns: df[col] = pd.NA
 
+        # Orden por posición (la clasificación ya viene ordenada)
         summary_sorted = df.sort_values("position").reset_index(drop=True)
 
+        # === CAMBIO 1: Añadir columna "Pos." a la izquierda (desde 'position')
+        # === CAMBIO 2: Eliminar "Estado" del display
         if "best_time_str" in df.columns and "last_time_str" in df.columns:
-            display = summary_sorted[["kart_number","best_time_str","last_time_str","laps","estado"]].copy()
-            display.columns = ["Kart","Mejor vuelta","Última vuelta","Vueltas","Estado"]
+            display = summary_sorted[["position","kart_number","best_time_str","last_time_str","laps"]].copy()
+            display.columns = ["Pos.","Kart","Mejor vuelta","Última vuelta","Vueltas"]
         else:
             display = summary_sorted.copy()
             display["Mejor vuelta"] = display["best_time_ms"].apply(ms_to_timestr)
             display["Última vuelta"] = display["last_time_ms"].apply(ms_to_timestr)
             display["Vueltas"] = display["laps"].astype("Int64")
-            display["Estado"] = display["estado"]
-            display = display[["kart_number","Mejor vuelta","Última vuelta","Vueltas","Estado"]]
-            display.columns = ["Kart","Mejor vuelta","Última vuelta","Vueltas","Estado"]
+            display = display[["position","kart_number","Mejor vuelta","Última vuelta","Vueltas"]]
+            display.columns = ["Pos.","Kart","Mejor vuelta","Última vuelta","Vueltas"]
 
+        # --- Lógica de transiciones (igual que antes, usando datos ya agregados) ---
         prev_global_best = st.session_state.global_best
         prev_best_map    = st.session_state.prev_best
         prev_lap_map     = st.session_state.last_lap_count
