@@ -37,7 +37,7 @@ td, th {
    text-align: center;
    border: none !important;
    }
-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-family: Arial, Helvetica, sans-serif; }
+# table { width: 100%; border-collapse: collapse; margin-top: 10px; font-family: Arial, Helvetica, sans-serif; border: none !important; } 
 tr { transition: all 0.8s ease-in-out; }
 /* Ocultar UI Streamlit extra */
 #MainMenu, header, footer, div[data-testid="stFooter"], div[data-testid="stToolbar"],
