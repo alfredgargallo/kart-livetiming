@@ -40,6 +40,22 @@ tr { transition: all 0.8s ease-in-out; }
 div.viewerBadge_container__1QSob, div.viewerBadge_link__1S137, div.stDeployButton,
 a[href*="streamlit.app/profile"], a[href*="streamlit.io"] { display: none !important; }
 section.main > div.block-container + div { display: none !important; }
+table th,
+thead th,
+tr th {
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+
+/* (opcional) tu color de fondo y borde */
+table th {
+  background: #d9d9d9 !important;
+  border-bottom: 2px solid #aaa !important;
+}
+
+/* celdas normales pueden seguir centradas */
+table td { text-align: center; }
+
 </style>
 """, unsafe_allow_html=True)
 
