@@ -51,7 +51,7 @@ table {
   border-collapse: collapse;
   margin-top: 10px;
   font-family: Arial, Helvetica, sans-serif;
-  font-size: 11px;
+  font-size: 13px;
   border: none;
 }
 
