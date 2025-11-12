@@ -13,7 +13,7 @@ REFRESH_INTERVAL = 2  # segundos
 # ============================
 
 st.set_page_config(page_title="K4TCS Leaderboard", layout="centered")
-st.image("media/kartingsallent.png")
+st.image("kartingsallent.png")
 st.markdown("""
     <div style="background-color: black; padding: 10px 30px; align-items: center;">
         <h1 style="color: white; text-align: center; margin: 0;">Livetiming</h1>
