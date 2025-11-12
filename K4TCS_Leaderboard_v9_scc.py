@@ -40,6 +40,9 @@ tr { transition: all 0.8s ease-in-out; }
 div.viewerBadge_container__1QSob, div.viewerBadge_link__1S137, div.stDeployButton,
 a[href*="streamlit.app/profile"], a[href*="streamlit.io"] { display: none !important; }
 section.main > div.block-container + div { display: none !important; }
+section.main > div.block-container {
+    padding-top: 0rem !important;   /* antes suele ser 2–6rem */
+}
 </style>
 """, unsafe_allow_html=True)
 
