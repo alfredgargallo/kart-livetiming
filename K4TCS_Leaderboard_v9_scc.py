@@ -132,11 +132,21 @@ def ms_to_timestr(ms):
 
 def render_table_with_fade(display_df, row_color):
     html = "<table>"
+    # Cabecera
     html += "<tr>" + "".join(f"<th>{c}</th>" for c in display_df.columns) + "</tr>"
+    # Filas
     for i, row in display_df.iterrows():
         color_class = row_color.get(i, "")
         row_class = f"fade-cell {color_class}" if color_class else "fade-cell"
-        html += f"<tr class='{row_class}'>" + "".join(f"<td>{val}</td>" for val in row) + "</tr>"
+
+        cells = []
+        for j, val in enumerate(row):
+            if j == 0:  # primera columna: "Pos."
+                cells.append(f"<td><span class='pos-badge'>{val}</span></td>")
+            else:
+                cells.append(f"<td>{val}</td>")
+
+        html += f"<tr class='{row_class}'>" + "".join(cells) + "</tr>"
     html += "</table>"
     st.markdown(html, unsafe_allow_html=True)
 
