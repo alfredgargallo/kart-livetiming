@@ -59,7 +59,11 @@ table th {
 
 /* celdas normales pueden seguir centradas */
 table td { text-align: center; }
-
+table td:first-child {
+  background-color: #fff8b3;   /* amarillo suave */
+  font-weight: bold;
+  color: #333;                 /* texto oscuro para contraste */
+}
 </style>
 """, unsafe_allow_html=True)
 
