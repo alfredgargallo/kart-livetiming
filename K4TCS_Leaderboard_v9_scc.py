@@ -23,52 +23,106 @@ st.markdown("""
 
 st.markdown("""
 <style>
+/* =========================
+   1) Animaciones y transiciones de celdas
+   ========================= */
 .fade-cell { transition: background-color 0.8s ease, border 0.4s ease; }
+
 .gray  { background-color: #f0f0f0; }
 .green { background-color: #d4edda; border: 2px solid #28a745; }
 .purple{ background-color: #ead3ff; border: 2px solid #7f3fbf; }
+
 .flash { animation: flashGlow 1s ease-in-out; }
-@keyframes flashGlow { 0% { box-shadow: 0 0 18px 8px rgba(255,235,59,0.95); } 100% { box-shadow: none; } }
+@keyframes flashGlow {
+  0%   { box-shadow: 0 0 18px 8px rgba(255,235,59,0.95); }
+  100% { box-shadow: none; }
+}
+
 .slide-in { animation: slideInAnim 0.8s ease-out; }
-@keyframes slideInAnim { 0% { transform: translateX(-20px); opacity: 0.5; } 100% { transform: translateX(0); opacity: 1; } }
-th { background: #d9d9d9; border-bottom: 2px solid #aaa; }
-td, th { 
-   padding: 3px !important; 
-   text-align: center;
-   border: none !important;
-   }
-# table { width: 100%; border-collapse: collapse; margin-top: 10px; font-family: Arial, Helvetica, sans-serif; } 
+@keyframes slideInAnim {
+  0%   { transform: translateX(-20px); opacity: 0.5; }
+  100% { transform: translateX(0);    opacity: 1;   }
+}
+
+/* =========================
+   2) Estructura base de la tabla
+   ========================= */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  font-family: Arial, Helvetica, sans-serif;
+  border: none; /* sin bordes exteriores */
+}
 tr { transition: all 0.8s ease-in-out; }
-/* Ocultar UI Streamlit extra */
-#MainMenu, header, footer, div[data-testid="stFooter"], div[data-testid="stToolbar"],
-div.viewerBadge_container__1QSob, div.viewerBadge_link__1S137, div.stDeployButton,
-a[href*="streamlit.app/profile"], a[href*="streamlit.io"] { display: none !important; }
-section.main > div.block-container + div { display: none !important; }
+
+td, th {
+  padding: 3px !important;
+  text-align: center;
+  border: none !important; /* sin líneas entre celdas */
+  vertical-align: middle;
+}
+
+/* =========================
+   3) Cabecera
+   ========================= */
 table th,
 thead th,
 tr th {
   text-align: center !important;
   vertical-align: middle !important;
-  padding: 2px!important;
-  border: none !important;
 }
 
-/* (opcional) tu color de fondo y borde */
 table th {
   background: #d9d9d9 !important;
   border-bottom: 2px solid #aaa !important;
 }
 
-/* celdas normales pueden seguir centradas */
-table td { text-align: center; }
+/* Si no hay <thead>, asegurar fondo gris en la primera fila */
+table tr:first-child { background: #d9d9d9 !important; }
+
+/* =========================
+   4) Estilo de filas y columnas
+   ========================= */
+/* Zebra striping: alterna blanco y gris claro (sin afectar cabecera) */
+table tr:nth-child(even) { background-color: #ffffff; }
+table tr:nth-child(odd)  { background-color: #f7f7f7; }
+table tr:first-child     { background-color: #d9d9d9 !important; }
+
+/* =========================
+   5) "Badge" amarillo para la primera columna (Pos.)
+   ========================= */
 table td:first-child {
-  background-color: #fff8b3;   /* amarillo suave */
-  font-weight: bold;
-  color: #333;                 /* texto oscuro para contraste */
+  text-align: center;
 }
-table tr:nth-child(odd)  { background-color: #ffffff; }  /* filas impares: blanco */
-table tr:nth-child(even) { background-color: #f7f7f7; }  /* filas pares: gris claro */
+table td:first-child span.pos-badge {
+  display: inline-block;
+  background-color: #fff8b3;   /* amarillo suave */
+  border: 2px solid #ffd60a;   /* borde amarillo más fuerte */
+  border-radius: 6px;          /* esquinas redondeadas */
+  padding: 2px 8px;            /* espacio interno */
+  font-weight: bold;
+  color: #333;                 /* texto oscuro */
+  min-width: 30px;
+}
+
+/* =========================
+   6) Ocultar elementos extra de la interfaz Streamlit
+   ========================= */
+#MainMenu,
+header,
+footer,
+div[data-testid="stFooter"],
+div[data-testid="stToolbar"],
+div.viewerBadge_container__1QSob,
+div.viewerBadge_link__1S137,
+div.stDeployButton,
+a[href*="streamlit.app/profile"],
+a[href*="streamlit.io"] { display: none !important; }
+
+section.main > div.block-container + div { display: none !important; }
 </style>
+
 """, unsafe_allow_html=True)
 
 def ms_to_timestr(ms):
