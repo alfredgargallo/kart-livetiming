@@ -60,7 +60,7 @@ tr {
 }
 
 td, th {
-  padding: 6px !important;
+  padding: 3px !important;
   text-align: center;
   vertical-align: middle;
   border: none !important;          /* 🔸 elimina líneas entre celdas */
