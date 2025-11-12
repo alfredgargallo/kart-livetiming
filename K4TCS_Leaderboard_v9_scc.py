@@ -59,15 +59,11 @@ table th {
 
 /* celdas normales pueden seguir centradas */
 table td { text-align: center; }
-table td:first-child span.pos-badge {
-  display: inline-block;
+table td:first-child {
   background-color: #fff8b3;   /* amarillo suave */
-  border: 2px solid #ffd60a;   /* borde más fuerte */
-  border-radius: 6px;          /* bordes redondeados */
-  padding: 2px 8px;            /* espacio alrededor del número */
+  border: 2px solid #ffd60a;   /* borde amarillo más fuerte */
   font-weight: bold;
-  color: #333;                 /* texto oscuro */
-  min-width: 30px;
+  color: #333;                 /* texto oscuro para contraste */
 }
 </style>
 """, unsafe_allow_html=True)
