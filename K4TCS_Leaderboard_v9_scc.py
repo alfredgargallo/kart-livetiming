@@ -24,10 +24,9 @@ st.markdown("""
 st.markdown("""
 <style>
 /* =========================
-   1) Animaciones y transiciones de celdas
+   1) Animaciones y transiciones
    ========================= */
 .fade-cell { transition: background-color 0.8s ease, border 0.4s ease; }
-
 .gray  { background-color: #f0f0f0; }
 .green { background-color: #d4edda; border: 2px solid #28a745; }
 .purple{ background-color: #ead3ff; border: 2px solid #7f3fbf; }
@@ -41,73 +40,69 @@ st.markdown("""
 .slide-in { animation: slideInAnim 0.8s ease-out; }
 @keyframes slideInAnim {
   0%   { transform: translateX(-20px); opacity: 0.5; }
-  100% { transform: translateX(0);    opacity: 1;   }
+  100% { transform: translateX(0); opacity: 1; }
 }
 
 /* =========================
-   2) Estructura base de la tabla
+   2) Tabla base
    ========================= */
 table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 10px;
   font-family: Arial, Helvetica, sans-serif;
-  border: none; /* sin bordes exteriores */
+  border: none;
 }
-tr { transition: all 0.8s ease-in-out; }
+
+tr {
+  transition: all 0.8s ease-in-out;
+  border: none !important;          /* 🔸 elimina líneas entre filas */
+}
 
 td, th {
-  padding: 3px !important;
+  padding: 6px !important;
   text-align: center;
-  border: none !important; /* sin líneas entre celdas */
   vertical-align: middle;
+  border: none !important;          /* 🔸 elimina líneas entre celdas */
 }
 
 /* =========================
    3) Cabecera
    ========================= */
-table th,
-thead th,
-tr th {
-  text-align: center !important;
-  vertical-align: middle !important;
-}
-
 table th {
-  background: #d9d9d9 !important;
-  border-bottom: 2px solid #aaa !important;
+  background: #d9d9d9 !important;   /* gris claro */
+  border: none !important;          /* sin líneas */
+  color: #000;
+  text-align: center;
 }
-
-/* Si no hay <thead>, asegurar fondo gris en la primera fila */
-table tr:first-child { background: #d9d9d9 !important; }
 
 /* =========================
-   4) Estilo de filas y columnas
+   4) Zebra striping
    ========================= */
-/* Zebra striping: alterna blanco y gris claro (sin afectar cabecera) */
 table tr:nth-child(even) { background-color: #ffffff; }
 table tr:nth-child(odd)  { background-color: #f7f7f7; }
-table tr:first-child     { background-color: #d9d9d9 !important; }
+table tr:first-child     { background-color: #d9d9d9 !important; } /* cabecera */
 
 /* =========================
-   5) "Badge" amarillo para la primera columna (Pos.)
+   5) Badge amarillo en la primera columna
    ========================= */
 table td:first-child {
   text-align: center;
 }
+
 table td:first-child span.pos-badge {
   display: inline-block;
-  background-color: #fff8b3;   /* amarillo suave */
-  border: 2px solid #ffd60a;   /* borde amarillo más fuerte */
-  border-radius: 6px;          /* esquinas redondeadas */
-  padding: 2px 8px;            /* espacio interno */
+  background-color: #fff8b3;   /* fondo amarillo suave */
+  border: 2px solid #ffd60a;   /* borde amarillo fuerte */
+  border-radius: 6px;
+  padding: 2px 8px;
   font-weight: bold;
-  color: #333;                 /* texto oscuro */
-  min-width: 30px;
+  color: #333;
+  min-width: 28px;
 }
 
 /* =========================
-   6) Ocultar elementos extra de la interfaz Streamlit
+   6) Ocultar interfaz Streamlit
    ========================= */
 #MainMenu,
 header,
@@ -118,9 +113,12 @@ div.viewerBadge_container__1QSob,
 div.viewerBadge_link__1S137,
 div.stDeployButton,
 a[href*="streamlit.app/profile"],
-a[href*="streamlit.io"] { display: none !important; }
-
-section.main > div.block-container + div { display: none !important; }
+a[href*="streamlit.io"] {
+  display: none !important;
+}
+section.main > div.block-container + div {
+  display: none !important;
+}
 </style>
 
 """, unsafe_allow_html=True)
