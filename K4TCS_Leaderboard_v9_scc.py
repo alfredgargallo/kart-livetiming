@@ -34,7 +34,8 @@ st.markdown("""
 th { background: #d9d9d9; border-bottom: 2px solid #aaa; }
 td, th { 
    padding: 3px !important; 
-   text-align: center; 
+   text-align: center;
+   border: none !important;
    }
 table { width: 100%; border-collapse: collapse; margin-top: 10px; font-family: Arial, Helvetica, sans-serif; }
 tr { transition: all 0.8s ease-in-out; }
