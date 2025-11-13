@@ -237,7 +237,7 @@ try:
         if "best_time_str" in df.columns and "last_time_str" in df.columns:
             display = summary_sorted[["position", "kart_number",
                                       "best_time_str", "last_time_str", "laps"]].copy()
-            display.columns = ["Pos.", "Kart", "Mejor vuelta", "Última vuelta", "Vueltas"]
+            display.columns = ["Pos", "Num", "Mejor", "Ultima", "Vueltas"]
         else:
             display = summary_sorted.copy()
             display["Mejor vuelta"] = display["best_time_ms"].apply(ms_to_timestr)
