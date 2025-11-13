@@ -72,6 +72,14 @@ td, th {
   border: none !important;          /* elimina líneas entre celdas */
 }
 
+/* Columna estrecha para flechas (sin encabezado) */
+th.arrow-col,
+td.arrow-col {
+  width: 18px;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
 /* =========================
    3) Cabecera
    ========================= */
@@ -111,7 +119,8 @@ table td:first-child span.pos-badge {
    6) Indicador de cambio de posición (flechas)
    ========================= */
 .pos-change {
-  margin-left: 6px;
+  display: inline-block;
+  margin: 0;
   font-size: 12px;
   font-weight: 700;
   opacity: 1;
@@ -161,32 +170,52 @@ def ms_to_timestr(ms):
 
 def render_table_with_fade(display_df, row_color):
     html = "<table>"
-    # Cabecera
-    html += "<tr>" + "".join(f"<th>{c}</th>" for c in display_df.columns) + "</tr>"
-    # Filas
+    # Cabecera: Pos | (columna vacía para flecha) | Kart | Mejor | Última | Vueltas
+    html += (
+        "<tr>"
+        "<th>Pos</th>"
+        "<th class='arrow-col'></th>"
+        "<th>Kart</th>"
+        "<th>Mejor</th>"
+        "<th>Última</th>"
+        "<th>Vueltas</th>"
+        "</tr>"
+    )
+
     now_ts = time.time()
     for i, row in display_df.iterrows():
         color_class = row_color.get(i, "")
         row_class = f"fade-cell {color_class}" if color_class else "fade-cell"
 
-        # Segunda columna es "Kart" (primera es "Pos.")
+        # Asumimos columnas: ["Pos", "Kart", "Mejor", "Última", "Vueltas"]
+        pos_val  = row.iloc[0]
         kart_val = str(row.iloc[1]) if len(row) > 1 else ""
+        mejor    = row.iloc[2] if len(row) > 2 else ""
+        ultima   = row.iloc[3] if len(row) > 3 else ""
+        vueltas  = row.iloc[4] if len(row) > 4 else ""
+
+        # Flecha según movimiento almacenado en move_hint
         hint = st.session_state.move_hint.get(kart_val, None)
         arrow_html = ""
         if hint and now_ts < hint.get("until", 0):
             if hint.get("dir") == "up":
-                arrow_html = " <span class='pos-change pos-up'>▲</span>"
+                arrow_html = "<span class='pos-change pos-up'>▲</span>"
             elif hint.get("dir") == "down":
-                arrow_html = " <span class='pos-change pos-down'>▼</span>"
+                arrow_html = "<span class='pos-change pos-down'>▼</span>"
 
         cells = []
-        for j, val in enumerate(row):
-            if j == 0:  # primera columna: "Pos."
-                cells.append(f"<td><span class='pos-badge'>{val}</span>{arrow_html}</td>")
-            else:
-                cells.append(f"<td>{val}</td>")
+        # Columna 1: Pos con badge
+        cells.append(f"<td><span class='pos-badge'>{pos_val}</span></td>")
+        # Columna 2: flecha (puede estar vacía)
+        cells.append(f"<td class='arrow-col'>{arrow_html}</td>")
+        # Resto de columnas
+        cells.append(f"<td>{kart_val}</td>")
+        cells.append(f"<td>{mejor}</td>")
+        cells.append(f"<td>{ultima}</td>")
+        cells.append(f"<td>{vueltas}</td>")
 
         html += f"<tr class='{row_class}'>" + "".join(cells) + "</tr>"
+
     html += "</table>"
     st.markdown(html, unsafe_allow_html=True)
 
@@ -235,18 +264,18 @@ try:
         summary_sorted = df.sort_values("position").reset_index(drop=True)
 
         # Display con columna Pos. a la izquierda, sin Estado
+        # Normalizamos nombres a: ["Pos", "Kart", "Mejor", "Última", "Vueltas"]
         if "best_time_str" in df.columns and "last_time_str" in df.columns:
             display = summary_sorted[["position", "kart_number",
                                       "best_time_str", "last_time_str", "laps"]].copy()
-            display.columns = ["Pos", "Num", "Mejor", "Ultima", "Vueltas"]
+            display.columns = ["Pos", "Kart", "Mejor", "Última", "Vueltas"]
         else:
             display = summary_sorted.copy()
-            display["Mejor vuelta"] = display["best_time_ms"].apply(ms_to_timestr)
-            display["Última vuelta"] = display["last_time_ms"].apply(ms_to_timestr)
+            display["Mejor"] = display["best_time_ms"].apply(ms_to_timestr)
+            display["Última"] = display["last_time_ms"].apply(ms_to_timestr)
             display["Vueltas"] = display["laps"].astype("Int64")
-            display = display[["position", "kart_number",
-                               "Mejor vuelta", "Última vuelta", "Vueltas"]]
-            display.columns = ["Pos.", "Kart", "Mejor vuelta", "Última vuelta", "Vueltas"]
+            display = display[["position", "kart_number", "Mejor", "Última", "Vueltas"]]
+            display.columns = ["Pos", "Kart", "Mejor", "Última", "Vueltas"]
 
         # --- Lógica de transiciones (igual que antes, usando datos ya agregados) ---
         prev_global_best = st.session_state.global_best
