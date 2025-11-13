@@ -8,8 +8,12 @@ import streamlit as st
 # ============================
 # CONFIGURABLES (SCC + Drive)
 # ============================
-CSV_URL = os.environ.get("CSV_URL", "https://drive.google.com/uc?export=download&id=1AjZI7oFmivBzs39fX7f_bWwyULA_P75T")
+CSV_URL = os.environ.get(
+    "CSV_URL",
+    "https://drive.google.com/uc?export=download&id=1AjZI7oFmivBzs39fX7f_bWwyULA_P75T"
+)
 REFRESH_INTERVAL = 2  # segundos
+HINT_DURATION = 3     # segundos que se ve la flecha ▲ / ▼
 # ============================
 
 st.set_page_config(page_title="K4TCS Leaderboard", layout="centered")
@@ -57,14 +61,14 @@ table {
 
 tr {
   transition: all 0.8s ease-in-out;
-  border: none !important;          /* 🔸 elimina líneas entre filas */
+  border: none !important;          /* elimina líneas entre filas */
 }
 
 td, th {
   padding: 3px !important;
   text-align: center;
   vertical-align: middle;
-  border: none !important;          /* 🔸 elimina líneas entre celdas */
+  border: none !important;          /* elimina líneas entre celdas */
 }
 
 /* =========================
@@ -103,7 +107,25 @@ table td:first-child span.pos-badge {
 }
 
 /* =========================
-   6) Ocultar interfaz Streamlit
+   6) Indicador de cambio de posición (flechas)
+   ========================= */
+.pos-change {
+  margin-left: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  opacity: 1;
+  animation: fadeOut 2s 1s forwards;  /* visible un poco y luego desaparece */
+}
+.pos-up   { color: #1aaa55; }  /* verde subida */
+.pos-down { color: #d33;    }  /* rojo bajada */
+
+@keyframes fadeOut {
+  0%   { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* =========================
+   7) Ocultar interfaz Streamlit
    ========================= */
 #MainMenu,
 header,
@@ -125,10 +147,15 @@ section.main > div.block-container + div {
 """, unsafe_allow_html=True)
 
 def ms_to_timestr(ms):
-    if pd.isna(ms): return "-"
-    try: ms = int(ms)
-    except Exception: return "-"
-    mm = ms // 60000; ss = (ms % 60000) // 1000; mmm = ms % 1000
+    if pd.isna(ms):
+        return "-"
+    try:
+        ms = int(ms)
+    except Exception:
+        return "-"
+    mm = ms // 60000
+    ss = (ms % 60000) // 1000
+    mmm = ms % 1000
     return f"{mm:02d}:{ss:02d}:{mmm:03d}"
 
 def render_table_with_fade(display_df, row_color):
@@ -136,14 +163,25 @@ def render_table_with_fade(display_df, row_color):
     # Cabecera
     html += "<tr>" + "".join(f"<th>{c}</th>" for c in display_df.columns) + "</tr>"
     # Filas
+    now_ts = time.time()
     for i, row in display_df.iterrows():
         color_class = row_color.get(i, "")
         row_class = f"fade-cell {color_class}" if color_class else "fade-cell"
 
+        # Segunda columna es "Kart" (primera es "Pos.")
+        kart_val = str(row.iloc[1]) if len(row) > 1 else ""
+        hint = st.session_state.move_hint.get(kart_val, None)
+        arrow_html = ""
+        if hint and now_ts < hint.get("until", 0):
+            if hint.get("dir") == "up":
+                arrow_html = " <span class='pos-change pos-up'>▲</span>"
+            elif hint.get("dir") == "down":
+                arrow_html = " <span class='pos-change pos-down'>▼</span>"
+
         cells = []
         for j, val in enumerate(row):
             if j == 0:  # primera columna: "Pos."
-                cells.append(f"<td><span class='pos-badge'>{val}</span></td>")
+                cells.append(f"<td><span class='pos-badge'>{val}</span>{arrow_html}</td>")
             else:
                 cells.append(f"<td>{val}</td>")
 
@@ -164,12 +202,17 @@ if "last_lap_count" not in st.session_state:
     st.session_state.last_lap_count = {}
 if "prev_positions" not in st.session_state:
     st.session_state.prev_positions = {}
+# Nuevo: hints de movimiento (▲ / ▼)
+if "move_hint" not in st.session_state:
+    st.session_state.move_hint = {}
 
 placeholder = st.empty()
 
 try:
     while True:
         now = datetime.now()
+        now_ts = time.time()
+
         try:
             df = load_classification(CSV_URL)
         except Exception:
@@ -183,31 +226,32 @@ try:
             continue
 
         # Asegurar columnas esperadas del CSV de clasificación
-        # (position, kart_number, best_time_ms, best_time_str, last_time_ms, last_time_str, laps, estado, updated_at_utc)
-        for col in ["position","kart_number","best_time_ms","last_time_ms","laps"]:
-            if col not in df.columns: df[col] = pd.NA
+        for col in ["position", "kart_number", "best_time_ms", "last_time_ms", "laps"]:
+            if col not in df.columns:
+                df[col] = pd.NA
 
         # Orden por posición (la clasificación ya viene ordenada)
         summary_sorted = df.sort_values("position").reset_index(drop=True)
 
-        # === CAMBIO 1: Añadir columna "Pos." a la izquierda (desde 'position')
-        # === CAMBIO 2: Eliminar "Estado" del display
+        # Display con columna Pos. a la izquierda, sin Estado
         if "best_time_str" in df.columns and "last_time_str" in df.columns:
-            display = summary_sorted[["position","kart_number","best_time_str","last_time_str","laps"]].copy()
-            display.columns = ["Pos.","Kart","Mejor vuelta","Última vuelta","Vueltas"]
+            display = summary_sorted[["position", "kart_number",
+                                      "best_time_str", "last_time_str", "laps"]].copy()
+            display.columns = ["Pos.", "Kart", "Mejor vuelta", "Última vuelta", "Vueltas"]
         else:
             display = summary_sorted.copy()
             display["Mejor vuelta"] = display["best_time_ms"].apply(ms_to_timestr)
             display["Última vuelta"] = display["last_time_ms"].apply(ms_to_timestr)
             display["Vueltas"] = display["laps"].astype("Int64")
-            display = display[["position","kart_number","Mejor vuelta","Última vuelta","Vueltas"]]
-            display.columns = ["Pos.","Kart","Mejor vuelta","Última vuelta","Vueltas"]
+            display = display[["position", "kart_number",
+                               "Mejor vuelta", "Última vuelta", "Vueltas"]]
+            display.columns = ["Pos.", "Kart", "Mejor vuelta", "Última vuelta", "Vueltas"]
 
         # --- Lógica de transiciones (igual que antes, usando datos ya agregados) ---
         prev_global_best = st.session_state.global_best
-        prev_best_map    = st.session_state.prev_best
-        prev_lap_map     = st.session_state.last_lap_count
-        prev_positions   = st.session_state.prev_positions
+        prev_best_map = st.session_state.prev_best
+        prev_lap_map = st.session_state.last_lap_count
+        prev_positions = st.session_state.prev_positions
 
         bests_nonnull = summary_sorted["best_time_ms"].dropna()
         current_global_best = int(bests_nonnull.min()) if not bests_nonnull.empty else None
@@ -253,8 +297,20 @@ try:
                     color = "green" if improved else "gray"
 
             prev_pos = prev_positions.get(k)
-            if prev_pos is not None and i < prev_pos:
-                color = (color + " " if color else "") + "flash slide-in"
+            if prev_pos is not None:
+                # Subida de posición
+                if i < prev_pos:
+                    color = (color + " " if color else "") + "flash slide-in"
+                    st.session_state.move_hint[k] = {
+                        "dir": "up",
+                        "until": now_ts + HINT_DURATION
+                    }
+                # Bajada de posición
+                elif i > prev_pos:
+                    st.session_state.move_hint[k] = {
+                        "dir": "down",
+                        "until": now_ts + HINT_DURATION
+                    }
 
             row_color[i] = color
 
@@ -262,9 +318,10 @@ try:
             render_table_with_fade(display, row_color)
             st.caption(f"Última actualización: {now.strftime('%H:%M:%S')}")
 
-        new_prev_best   = {}
-        new_last_lap    = {}
-        new_positions   = {}
+        # Actualizar estado
+        new_prev_best = {}
+        new_last_lap = {}
+        new_positions = {}
         for i, r in summary_sorted.iterrows():
             k = str(r["kart_number"])
             b = r["best_time_ms"]
@@ -284,6 +341,13 @@ try:
         st.session_state.global_best = int(current_global_best) if current_global_best is not None else prev_global_best
         st.session_state.last_lap_count = new_last_lap
         st.session_state.prev_positions = new_positions
+
+        # Limpiar hints expirados para no acumular
+        now_ts2 = time.time()
+        st.session_state.move_hint = {
+            k: v for k, v in st.session_state.move_hint.items()
+            if now_ts2 < v.get("until", 0)
+        }
 
         time.sleep(REFRESH_INTERVAL)
 
