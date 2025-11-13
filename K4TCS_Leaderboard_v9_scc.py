@@ -143,6 +143,7 @@ a[href*="streamlit.io"] {
 section.main > div.block-container + div {
   display: none !important;
 }
+reportview-container .main footer {visibility: hidden;}
 </style>
 
 """, unsafe_allow_html=True)
