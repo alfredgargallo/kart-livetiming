@@ -31,9 +31,9 @@ st.markdown("""
    1) Animaciones y transiciones
    ========================= */
 .fade-cell { transition: background-color 0.8s ease, border 0.4s ease; }
-.gray  { background-color: #f0f0f0; }
-.green { background-color: #d4edda; border: 2px solid #28a745; }
-.purple{ background-color: #ead3ff; border: 2px solid #7f3fbf; }
+.gray  { background-color: #f0f0f0 !important; }
+.green { background-color: #d4edda !important; border: 2px solid #28a745; }
+.purple{ background-color: #ead3ff !important; border: 2px solid #7f3fbf; }
 
 .flash { animation: flashGlow 1s ease-in-out; }
 @keyframes flashGlow {
