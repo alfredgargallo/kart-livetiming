@@ -31,7 +31,7 @@ st.markdown("""
    1) Animaciones y transiciones
    ========================= */
 .fade-cell { transition: background-color 0.8s ease, border 0.4s ease; }
-.gray  { background-color: #f0f0f0 !important; }
+.gray  { background-color: #ffffe0 !important; }
 .green { background-color: #d4edda !important; border: 2px solid #28a745; }
 .purple{ background-color: #ead3ff !important; border: 2px solid #7f3fbf; }
 
