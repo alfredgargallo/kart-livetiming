@@ -170,14 +170,14 @@ def ms_to_timestr(ms):
 
 def render_table_with_fade(display_df, row_color):
     html = "<table>"
-    # Cabecera: Pos | (columna vacía para flecha) | Kart | Mejor | Última | Vueltas
+    # Cabecera: Pos | (flecha) | Kart | Piloto | Mejor | Vueltas
     html += (
         "<tr>"
         "<th>Pos</th>"
         "<th class='arrow-col'></th>"
         "<th>Kart</th>"
+        "<th>Piloto</th>"
         "<th>Mejor</th>"
-        "<th>Última</th>"
         "<th>Vueltas</th>"
         "</tr>"
     )
@@ -187,14 +187,14 @@ def render_table_with_fade(display_df, row_color):
         color_class = row_color.get(i, "")
         row_class = f"fade-cell {color_class}" if color_class else "fade-cell"
 
-        # Asumimos columnas: ["Pos", "Kart", "Mejor", "Última", "Vueltas"]
-        pos_val  = row.iloc[0]
-        kart_val = str(row.iloc[1]) if len(row) > 1 else ""
-        mejor    = row.iloc[2] if len(row) > 2 else ""
-        ultima   = row.iloc[3] if len(row) > 3 else ""
-        vueltas  = row.iloc[4] if len(row) > 4 else ""
+        # Asumimos columnas: ["Pos", "Kart", "Piloto", "Mejor", "Vueltas"]
+        pos_val   = row.iloc[0]
+        kart_val  = str(row.iloc[1]) if len(row) > 1 else ""
+        piloto    = row.iloc[2] if len(row) > 2 else ""
+        mejor     = row.iloc[3] if len(row) > 3 else ""
+        vueltas   = row.iloc[4] if len(row) > 4 else ""
 
-        # Flecha según movimiento almacenado en move_hint
+        # Flecha según movimiento almacenado en move_hint (clave: kart_val)
         hint = st.session_state.move_hint.get(kart_val, None)
         arrow_html = ""
         if hint and now_ts < hint.get("until", 0):
@@ -210,8 +210,8 @@ def render_table_with_fade(display_df, row_color):
         cells.append(f"<td class='arrow-col'>{arrow_html}</td>")
         # Resto de columnas
         cells.append(f"<td>{kart_val}</td>")
+        cells.append(f"<td>{piloto}</td>")
         cells.append(f"<td>{mejor}</td>")
-        cells.append(f"<td>{ultima}</td>")
         cells.append(f"<td>{vueltas}</td>")
 
         html += f"<tr class='{row_class}'>" + "".join(cells) + "</tr>"
@@ -221,6 +221,7 @@ def render_table_with_fade(display_df, row_color):
 
 @st.cache_data(ttl=2)
 def load_classification(url: str):
+    # Cache con pequeño truco anti-cache de Google añadiendo un parámetro v=t
     return pd.read_csv(f"{url}&v={int(time.time())}")
 
 # Estado persistente para transiciones
@@ -232,7 +233,6 @@ if "last_lap_count" not in st.session_state:
     st.session_state.last_lap_count = {}
 if "prev_positions" not in st.session_state:
     st.session_state.prev_positions = {}
-# Nuevo: hints de movimiento (▲ / ▼)
 if "move_hint" not in st.session_state:
     st.session_state.move_hint = {}
 
@@ -260,24 +260,26 @@ try:
             if col not in df.columns:
                 df[col] = pd.NA
 
+        # Si no viene columna 'piloto' (compatibilidad), crearla como "kart_xx"
+        if "piloto" not in df.columns:
+            df["piloto"] = df["kart_number"].astype(str).apply(lambda k: f"kart_{k}")
+
         # Orden por posición (la clasificación ya viene ordenada)
         summary_sorted = df.sort_values("position").reset_index(drop=True)
 
-        # Display con columna Pos. a la izquierda, sin Estado
-        # Normalizamos nombres a: ["Pos", "Kart", "Mejor", "Última", "Vueltas"]
-        if "best_time_str" in df.columns and "last_time_str" in df.columns:
+        # Display con columnas: ["Pos", "Kart", "Piloto", "Mejor", "Vueltas"]
+        if "best_time_str" in df.columns:
             display = summary_sorted[["position", "kart_number",
-                                      "best_time_str", "last_time_str", "laps"]].copy()
-            display.columns = ["Pos", "Kart", "Mejor", "Última", "Vueltas"]
+                                      "piloto", "best_time_str", "laps"]].copy()
+            display.columns = ["Pos", "Kart", "Piloto", "Mejor", "Vueltas"]
         else:
             display = summary_sorted.copy()
             display["Mejor"] = display["best_time_ms"].apply(ms_to_timestr)
-            display["Última"] = display["last_time_ms"].apply(ms_to_timestr)
             display["Vueltas"] = display["laps"].astype("Int64")
-            display = display[["position", "kart_number", "Mejor", "Última", "Vueltas"]]
-            display.columns = ["Pos", "Kart", "Mejor", "Última", "Vueltas"]
+            display = display[["position", "kart_number", "piloto", "Mejor", "Vueltas"]]
+            display.columns = ["Pos", "Kart", "Piloto", "Mejor", "Vueltas"]
 
-        # --- Lógica de transiciones (igual que antes, usando datos ya agregados) ---
+        # --- Lógica de transiciones (basada en summary_sorted) ---
         prev_global_best = st.session_state.global_best
         prev_best_map = st.session_state.prev_best
         prev_lap_map = st.session_state.last_lap_count
@@ -372,7 +374,7 @@ try:
         st.session_state.last_lap_count = new_last_lap
         st.session_state.prev_positions = new_positions
 
-        # Limpiar hints expirados para no acumular
+        # Limpiar hints expirados
         now_ts2 = time.time()
         st.session_state.move_hint = {
             k: v for k, v in st.session_state.move_hint.items()
